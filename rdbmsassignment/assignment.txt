@@ -1,0 +1,195 @@
+2.
+			
+create table customer(
+custID int(10) auto_increment not null,
+name char(20) not null,
+email char(30),
+phone int(10) not null,
+primary key(custID)
+);
+create table waiter(
+empID int(5),
+empName char(20),
+mobile char(20),
+primary key(empID)
+);
+create table menu(
+itemID int(10) auto_increment not null,
+itemName char(20),
+price int(5) not null,
+primary key(itemID)
+);
+create table bill(
+total int(5),
+empID int(5),
+custID int(10),
+billID int(5),
+ts datetime,
+foreign key(custID) references customer(custID),
+foreign key(empID) references waiter(empID),
+primary key(billID)
+);
+create table orders(
+billID int(5),
+itemID int(10),
+quantity int(5),
+foreign key(billID) references bill(billID),
+foreign key(itemID) references menu(itemID)
+);
+
+
+mysql> SHOW TABLES;
++---------------------+
+| Tables_in_restraunt |
++---------------------+
+| bill                |
+| customer            |
+| menu                |
+| orders              |
+| waiter              |
++---------------------+
+5 rows in set (0.00 sec)
+
+---------------------------------------------------------------------------------------------------------------------------
+3.
+
+insert into customer values(1,'QWQE','abc@cd.com',4567);
+insert into customer values(2,'SDF','abc@hgggk.com',5646);
+mysql> select * from customer;
++--------+------+---------------+-------+
+| custID | name | email         | phone |
++--------+------+---------------+-------+
+|      1 | QWQE | abc@cd.com    |  4567 |
+|      2 | SDF  | abc@hgggk.com |  5646 |
++--------+------+---------------+-------+
+2 rows in set (0.00 sec)
+
+insert into waiter values(1,'DFAAAS',6479);
+mysql> select * from waiter;
++-------+---------+--------+
+| empID | empName | mobile |
++-------+---------+--------+
+|     1 | DFAAAS  | 6479   |
++-------+---------+--------+
+1 row in set (0.00 sec)
+
+insert into menu values(1,'asdf',200);
+insert into menu values(2,'qwef',500);
+
+mysql> select * from menu;
++--------+-------+-------+
+| itemID | price | name  |
++--------+-------+-------+
+|      1 |   200 |  asdf |
+|      2 |   500 |  qwef |
++--------+-------+-------+
+2 rows in set (0.00 sec)
+
+insert into bill values(1500, 1,1,1,'2018-01-05 09:24:04');
+mysql> select * from bill;
++-------+-------+--------+--------+---------------------+
+| total | empID | custID | billID | ts                  |
++-------+-------+--------+--------+---------------------+
+|  1500 |     1 |      1 |      1 | 2018-01-05 09:24:04 |
++-------+-------+--------+--------+---------------------+
+1 row in set (0.00 sec)
+
+insert into orders values(1,1,1);
+insert into orders values(1,2,1);
+mysql> select * from orders;
++--------+--------+----------+
+| billID | itemID | quantity |
++--------+--------+----------+
+|      1 |      1 |        1 |
+|      1 |      2 |        1 |
++--------+--------+----------+
+2 rows in set (0.00 sec)
+----------------------------------------------------------------------------------------------------------------------
+5.
+create view vw_customerSnapshot as select * from customer where custID=(select custID from bill group by custID order
+by(count(custID)) desc limit 1);
+
+mysql> select * from vw_customerSnapshot;
++--------+------+------------+-------+
+| custID | name | email      | phone |
++--------+------+------------+-------+
+|      1 | QWQE | abc@cd.com |  4567 |
++--------+------+------------+-------+
+1 row in set (0.06 sec)
+
+create view vw_orderSnapshot as select * from menu where itemID=(select itemID from orders group by itemID order by
+count(itemID) desc limit 1);
+
+mysql> select * from vw_orderSnapshot;
++--------+-------+
+| itemID | price |
++--------+-------+
+|      1 |   200 |
++--------+-------+
+1 row in set (0.00 sec)
+---------------------------------------------------------------------------------------------------------------
+6.
+delimiter $$
+CREATE procedure
+GetOrderTime(CustomerID int)
+BEGIN
+SELECT billID,(now()-ts)/60 AS elapse_time FROM bill WHERE custID = CustomerID ;
+END $$
+delimiter ;
+
+mysql> CALL GetOrderTime(1);
++--------+-------------+
+| billID | elapse_time |
++--------+-------------+
+|      1 |    533.8667 |
++--------+-------------+
+1 row in set (0.13 sec)
+
+Query OK, 0 rows affected (0.13 sec)
+
+----------------------------------------------------------------------------------------------------------------
+7.
+delimiter $$
+CREATE procedure GetOrder(CustID int)
+BEGIN
+SELECT o.billID,o.itemID FROM orders AS o,bill AS b WHERE o.billID=b.billID AND b.custID=CustID;
+END $$
+delimiter ;
+
+call GetOrder(1);
+mysql> call GetOrder(1);
++--------+--------+
+| billID | itemID |
++--------+--------+
+|      1 |      1 |
+|      1 |      2 |
++--------+--------+
+2 rows in set (0.02 sec)
+
+Query OK, 0 rows affected (0.03 sec)
+------------------------------------------------------------------------------------------------------------
+8.
+
+delimiter $$
+CREATE procedure sp_GetBill(IN OrderID int, OUT BillTOTAL int)
+BEGIN
+declare temp int;
+SELECT total into temp FROM bill WHERE billID=OrderID ;
+SET BillTOTAL = temp ;
+END $$
+delimiter ;
+
+mysql> set @abc =1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> call sp_GetBill(1,@abc);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select @abc as total;
++-------+
+| total |
++-------+
+|  1500 |
++-------+
+1 row in set (0.07 sec)
+--------------------------------------------THE-END-------------------------------------------------------------------
