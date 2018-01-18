@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>Hiii!!!</title>
+<script type='text/javascript' >
+function startCalc(){
+  interval = setInterval("calc()",1);
+}
+function calc(){
+  one = document.autoSumForm.firstBox.value;
+  two = document.autoSumForm.secondBox.value; 
+  operator =document.autoSumForm.operator.value; 
+  if(operator=="*"){
+   document.autoSumForm.thirdBox.value = (one * 1) * (two * 1);
+} else if(operator=="+"){
+   document.autoSumForm.thirdBox.value =  (one * 1) + (two * 1);}
+   else if(operator=="-"){
+   document.autoSumForm.thirdBox.value =  (one * 1) - (two * 1);}
+   else if(operator=="/"){
+   document.autoSumForm.thirdBox.value = (one * 1) / (two * 1);}
+   else {
+	document.autoSumForm.thirdBox.value = "Enter the correct operator";
+
+   }
+}
+
+
+function stopCalc(){
+  clearInterval(interval);
+}
+</script>
+</head>
+<body>
+
+Your Personal Calculator
+
+<form name="autoSumForm">
+  
+1st Number:<input class="right" type=text name="firstBox" value="" onFocus="startCalc();" onBlur="stopCalc();"><br>
+Operator(+,-,*,/):  <input class="right" type=text name="operator" value="+" onFocus="startCalc();" onBlur="stopCalc();"><br>
+2nd Number:<input class="right" type=text name="secondBox" value="" onFocus="startCalc();" onBlur="stopCalc();"><br>
+Result: <input class="right" type=text name="thirdBox">
+</form>
+
+
+</body>
+</html>
