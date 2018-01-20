@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>U noticed!!</title>
+		<script type="text/javascript" src="../js/script.js"></script>
+	</head>
+	<body>
+		<input type="checkbox" name="checkedNum" id="checkedNum" onclick = "toggleNumMode()" value="Name">Number Mode<br>
+		<div class="toggleObj">
+			<span>Gender:</span><br>
+			<input type="radio" name="gender" id="male">Male<br>
+			<input type="radio" name="gender" id="female">Female<br>
+			<p>Enter:</p>
+		</div>
+		<input type="checkbox" name="checkedName" id="checkedName" class="toggleObj" value="Name">Enter name:<br>
+		<input type="checkbox" name="checkedNumber" id="checkedNumber" class="toggleObj" value="Number">Enter Value:<br>
+		<input type="text" id="inputValue" name="value" placeholder="Enter"><br>
+		<button type="button" onclick="analyseInput()">Submit</button>
+		
+		<p id="answer"></p><br>
+		
+		<table id="myTable" class="toggleObj">
+			<tr>
+				<th>Sr.</th>
+				<th>Name</th> 
+				<th>Age</th>
+				<th>Gender</th>
+			</tr>
+			
+		</table>
+	
+	</body>
+</html>
